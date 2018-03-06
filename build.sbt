@@ -9,6 +9,6 @@ libraryDependencies += "org.atnos" %% "eff" % "5.1.0"
 
 
 resolvers += Resolver.sonatypeRepo("releases")
-
+scalacOptions += "-Ypartial-unification"
 // to write types like Reader[String, ?]
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")

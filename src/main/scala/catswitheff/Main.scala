@@ -8,6 +8,9 @@ import org.atnos.eff.future._
 import java.time.Instant
 import scala.concurrent._, duration._
 
+/**
+  * https://rea.tech/a-journey-into-extensible-effects-in-scala/
+  */
 object Main {
 
   case class Error(msg: String)
@@ -35,16 +38,15 @@ object Main {
         if (id.get > 1000) Right(User("Bob", id, PropertyId(123)))
         else Left(Error(s"Id ${id.get} in invalid range"))
       )
-
   }
 
-  def getUser[R : _either : _Future](id: UserId): Eff[R, User] =
+  def getUser[R: _either : _Future](id: UserId): Eff[R, User] =
     for {
       errorOrUser <- fromFuture(UserRepository.get(id))
       user <- fromEither(errorOrUser)
     } yield user
 
-  def getProperty[R: _either: _readerUrl](id: PropertyId): Eff[R, Property] =
+  def getProperty[R: _either : _readerUrl](id: PropertyId): Eff[R, Property] =
     for {
       propertyApiUrl <- ask[R, PropertyApiUrl]
       property <- if (propertyApiUrl.get == "https://production.property-api.com")
@@ -56,7 +58,7 @@ object Main {
   type _logger[R] = MemberIn[Writer[String, ?], R]
   type _readClock[R] = MemberIn[Reader[Instant, ?], R]
 
-  def logTime[R : _logger : _readClock](): Eff[R, Unit] =
+  def logTime[R: _logger : _readClock](): Eff[R, Unit] =
     for {
       time <- ask[R, Instant]
       _ <- tell(s"The current time is $time")
